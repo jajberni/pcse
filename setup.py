@@ -35,7 +35,6 @@ setup(
     license='EUPL',
     author=AUTHOR,
     install_requires=['numpy>=1.6.0',
-                      'SQLAlchemy>=0.8.0',
                       'PyYAML>=3.11',
                       'tabulate>=0.7.0',
                       'xlrd>=0.9.3',

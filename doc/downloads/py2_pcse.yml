@@ -19,8 +19,6 @@ dependencies:
 - snowballstemmer
 - sphinx
 - sphinx_rtd_theme
-- sqlalchemy
-- vs2008_runtime
 - wheel
 - xlrd
 - xlwt

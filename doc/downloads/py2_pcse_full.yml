@@ -64,7 +64,6 @@ dependencies:
 - snowballstemmer
 - sphinx
 - sphinx_rtd_theme
-- sqlalchemy
 - ssl_match_hostname
 - tk
 - tornado

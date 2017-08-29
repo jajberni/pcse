@@ -83,6 +83,7 @@ from . import crop
 if not __stable__:
     print("Warning: You are running a PCSE development version:  %s" % __version__)
 
-def test(dsn=None):
+
+def test():
     """Run all available tests for PCSE."""
-    tests.test_all(dsn)
+    tests.test_all()
