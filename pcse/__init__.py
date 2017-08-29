@@ -34,40 +34,6 @@ __version__ = "5.3.1b"
 
 import sys, os
 from . import util
-
-# First define and run setup before importing the rest of the stuff
-def setup():
-    """
-    Set up the .pcse folder and user settings file, add ~/.pcse to the
-    sys.path.
-    """
-
-    user_home = util.get_user_home()
-    pcse_user_home = os.path.join(user_home, ".pcse")
-    if not os.path.exists(pcse_user_home):
-        os.mkdir(pcse_user_home)
-
-    # Add PCSE home to python PATH
-    sys.path.append(pcse_user_home)
-
-    # Check existence of user settings file. If not exists, create it.
-    user_settings_file = os.path.join(pcse_user_home, "user_settings.py")
-    if not os.path.exists(user_settings_file):
-        pcse_dir = os.path.dirname(__file__)
-        default_settings_file = os.path.join(pcse_dir, "settings", "default_settings.py")
-        lines = open(default_settings_file).readlines()
-        with open(user_settings_file, "w") as fp:
-            for line in lines:
-                if line.startswith(("#", '"', "'", "import")):
-                    cline = line
-                elif len(line.strip()) == 0: # empty line
-                    cline = line
-                else:
-                    cline = "# " + line
-                fp.write(cline)
-
-setup()
-
 import logging.config
 from .settings import settings
 logging.config.dictConfig(settings.LOG_CONFIG)
