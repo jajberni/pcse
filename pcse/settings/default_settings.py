@@ -20,12 +20,9 @@ for everything that is not a setting (such as imported modules), prepend
 and underscore to the name.
 """
 
-import os as _os
-
-PCSE_USER_HOME = _os.path.join(_os.path.expanduser("~"), ".pcse")
 
 # Location for meteo cache files
-METEO_CACHE_DIR = _os.path.join(PCSE_USER_HOME, "meteo_cache")
+METEO_CACHE_DIR = "meteo_cache"
 
 # Do range checks for meteo variables
 METEO_RANGE_CHECKS = True
@@ -46,8 +43,7 @@ ZEROFY = True
 # Log files can become 1Mb large. When this file size is reached a new file is opened
 # and the old one is renamed. Only the most recent 7 log files are retained to avoid
 # getting large log file sizes.
-LOG_DIR = _os.path.join(PCSE_USER_HOME, "logs")
-LOG_FILE_NAME = _os.path.join(LOG_DIR, "pcse.log")
+
 LOG_LEVEL_FILE = "INFO"
 LOG_LEVEL_CONSOLE = "ERROR"
 LOG_CONFIG = \
@@ -68,19 +64,9 @@ LOG_CONFIG = \
                         'class':'logging.StreamHandler',
                         'formatter':'brief'
                     },
-                    'file': {
-                        'level':LOG_LEVEL_FILE,
-                        'class':'logging.handlers.RotatingFileHandler',
-                        'formatter':'standard',
-                        'filename':LOG_FILE_NAME,
-                        'maxBytes': 1024**2,
-                        'backupCount': 7,
-                        'mode':'a',
-                        'encoding': 'utf8'
-                    },
                 },
                 'root': {
-                         'handlers': ['console', 'file'],
+                         'handlers': ['console'],
                          'propagate': True,
                          'level':'NOTSET'
                 }

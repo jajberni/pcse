@@ -9,7 +9,6 @@ import numpy as np
 from ..base_classes import WeatherDataProvider, WeatherDataContainer
 from ..util import wind10to2, ea_from_tdew, reference_ET, check_angstromAB
 from ..exceptions import PCSEError
-from ..settings import settings
 
 # Define some lambdas to take care of unit conversions.
 MJ_to_J = lambda x: x * 1e6
@@ -96,44 +95,20 @@ class NASAPowerWeatherDataProvider(WeatherDataProvider):
         msg = "Retrieving weather data from NASA Power for lat/lon: (%f, %f)."
         self.logger.info(msg % (self.latitude, self.longitude))
 
-        # Check for existence of a cache file
-        cache_file = self._find_cache_file(self.latitude, self.longitude)
-        if cache_file is None or force_update is True:
-            msg = "No cache file or forced update, getting data from NASA Power."
+        # TODO: Store cache in the cloud rather tha files
+
+        try:
+            msg = "Cache is disabled, loading data from NASA Power."
             self.logger.debug(msg)
-            # No cache file, we really have to get the data from the NASA server
             self._get_and_process_NASAPower(self.latitude, self.longitude)
-            return
-
-        # get age of cache file, if age < 90 days then try to load it. If loading fails retrieve data
-        # from the NASA server .
-        r = os.stat(cache_file)
-        cache_file_date = date.fromtimestamp(r.st_mtime)
-        age = (date.today() - cache_file_date).days
-        if age < 90:
-            msg = "Start loading weather data from cache file: %s" % cache_file
+        except Exception as e:
+            msg = ("Reloading data from NASA failed, reverting to (outdated) " +
+                   "cache file")
             self.logger.debug(msg)
-
             status = self._load_cache_file()
             if status is not True:
-                msg = "Loading cache file failed, reloading data from NASA Power."
-                self.logger.debug(msg)
-                # Loading cache file failed!
-                self._get_and_process_NASAPower(self.latitude, self.longitude)
-        else:
-            # Cache file is too old. Try loading new data from NASA
-            try:
-                msg = "Cache file older then 90 days, reloading data from NASA Power."
-                self.logger.debug(msg)
-                self._get_and_process_NASAPower(self.latitude, self.longitude)
-            except Exception as e:
-                msg = ("Reloading data from NASA failed, reverting to (outdated) " +
-                       "cache file")
-                self.logger.debug(msg)
-                status = self._load_cache_file()
-                if status is not True:
-                    msg = "Outdated cache file failed loading."
-                    raise PCSEError(msg)
+                msg = "Outdated cache file failed loading."
+                raise PCSEError(msg)
 
     def _get_and_process_NASAPower(self, latitude, longitude):
         """Handles the retrieval and processing of the NASA Power data
@@ -230,55 +205,6 @@ class NASAPowerWeatherDataProvider(WeatherDataProvider):
         self.logger.debug(msg)
 
         return powerdata
-
-    def _find_cache_file(self, latitude, longitude):
-        """Try to find a cache file for given latitude/longitude.
-
-        Returns None if the cache file does not exist, else it returns the full path
-        to the cache file.
-        """
-        cache_filename = self._get_cache_filename(latitude, longitude)
-        if os.path.exists(cache_filename):
-            return cache_filename
-        else:
-            return None
-
-    def _get_cache_filename(self, latitude, longitude):
-        """Constructs the filename used for cache files given latitude and longitude
-
-        The latitude and longitude is coded into the filename by truncating on
-        0.1 degree. So the cache filename for a point with lat/lon 52.56/-124.78 will be:
-        NASAPowerWeatherDataProvider_LAT00525_LON-1247.cache
-        """
-
-        fname = "%s_LAT%05i_LON%05i.cache" % (self.__class__.__name__,
-                                              int(latitude*10), int(longitude*10))
-        cache_filename = os.path.join(settings.METEO_CACHE_DIR, fname)
-        return cache_filename
-
-    def _write_cache_file(self):
-        """Writes the meteo data from NASA Power to a cache file.
-        """
-        cache_filename = self._get_cache_filename(self.latitude, self.longitude)
-        try:
-            self._dump(cache_filename)
-        except (IOError, EnvironmentError) as e:
-            msg = "Failed to write cache to file '%s' due to: %s" % (cache_filename, e)
-            self.logger.warning(msg)
-
-    def _load_cache_file(self):
-        """Loads the data from the cache file. Return True if successful.
-        """
-        cache_filename = self._get_cache_filename(self.latitude, self.longitude)
-        try:
-            self._load(cache_filename)
-            msg = "Cache file successfully loaded."
-            self.logger.debug(msg)
-            return True
-        except (IOError, EnvironmentError, EOFError) as e:
-            msg = "Failed to load cache from file '%s' due to: %s" % (cache_filename, e)
-            self.logger.warning(msg)
-            return False
 
 
     def _make_WeatherDataContainers(self, recs):
