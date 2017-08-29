@@ -5,7 +5,6 @@
 
 Mainly used for running the WOFOST unit tests on the internal demo database.
 """
-from .database_definition import migrate_db
 from .db_input import fetch_cropdata
 from .db_input import fetch_soildata_layered
 from .db_input import fetch_soildata
