@@ -13,7 +13,6 @@ from math import log10, cos, sin, asin, sqrt, exp
 from collections import namedtuple
 from bisect import bisect_left
 import textwrap
-import sqlite3
 
 from . import exceptions as exc
 
@@ -832,19 +831,6 @@ def is_a_dekad(day):
                      datetime.timedelta(days=1)):
             return True
     return False
-
-
-def load_SQLite_dump_file(dump_file_name, SQLite_db_name):
-    """Build an SQLite database <SQLite_db_name> from dump file <dump_file_name>.
-    """
-
-    with open(dump_file_name) as fp:
-        sql_dump = fp.readlines()
-    str_sql_dump = "".join(sql_dump)
-    con = sqlite3.connect(SQLite_db_name)
-    con.executescript(str_sql_dump)
-    con.close()
-
 
 def safe_float(x):
     """Returns the value of x converted to float, if fails return None.
