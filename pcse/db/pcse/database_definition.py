@@ -15,7 +15,7 @@ Public functions:
   """
 from __future__ import print_function
 import os
-from sqlalchemy import *
+from sqlalchemy import Column, Numeric, Table, Integer, String, select, create_engine, MetaData, Date
 
 #-------------------------------------------------------------------------------
 # Redefine SQLAlchemy Float() type because the standard version doesn't allow
@@ -249,62 +249,5 @@ def _retrieve_records_from_source(metadata):
         for rec in r:
             records += [dict(rec)]
         table_collection[table] = records
-        
+
     return table_collection
-        
-#-------------------------------------------------------------------------------
-def migrate_db(target_dsn=None):
-    """Migrates the structure and data in the PyWOFOST demo database.
-
-keyword parameters: 
-    target_dsn : SQLAlchemy connection string specifying the database to 
-                 connect to.
-
-Examples of SQLalchemy connection strings"
-    For MySQL
-      target_dsn = "mysql://<user>:<password>@<hostname>/<database>"
-    For ORACLE
-      target_dsn = "oracle://<user>:<password>@TNS"
-    For SQLite (on windows)
-      target_dsn = "sqlite:///D:/DATA/pywofost.db"
-    For SQLite (on UNIX)
-      target_dsn = "sqlite:////home/user/pywofost.db"
-
-See: http://www.sqlalchemy.org/docs/06/core/engines.html#supported-databases
-     for more examples and other supported databases
-"""
-
-    # Open target database connection
-    if target_dsn is None:
-        print("No target_dsn specified, see docstring on migrate_db() function"
-              " for dsn specification.")
-        return
-    try:
-        target_engine = create_engine(target_dsn)
-        target_metadata = MetaData(target_engine)
-    except Exception as e:
-        print("Unable to open connection to database, due to following exception:"
-              " %s" % e.args[0])
-        return
-
-    # Open source database connection
-    installdir = os.path.dirname(os.path.abspath(__file__))
-    db_location = os.path.join(installdir, "pywofost.db")
-    dsn = "sqlite:///" + db_location
-    try:
-        source_engine = create_engine(dsn)
-        source_metadata = MetaData(source_engine)
-    except Exception as e:
-        print("Unable to open connection to pywofost demo database"
-              "with the following exception:\n %s" % e.args[0])
-    
-    # Build database
-    try:
-        _create_pywofost_tables(target_metadata)
-        table_collection = _retrieve_records_from_source(source_metadata)
-        _fill_pywofost_tables(target_engine, target_metadata, table_collection)
-        print("PyWOFOST demo database succesfully migrated!")
-    except Exception as e:
-        print("Migrating the database failed with the "
-              "following exception:\n %s" % e.args[0])
-

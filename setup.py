@@ -50,7 +50,6 @@ setup(
 #        '': ['*.txt', '*.rst', '*.conf', '*.csv', '*.sql'],
 #    },
     platforms='any',
-    test_suite='pcse.tests.make_test_suite',
     use_2to3=True,
     classifiers=[
         'Development Status :: 5 - Production/Stable',
