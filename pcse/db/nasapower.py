@@ -104,11 +104,7 @@ class NASAPowerWeatherDataProvider(WeatherDataProvider):
         except Exception as e:
             msg = ("Reloading data from NASA failed, reverting to (outdated) " +
                    "cache file")
-            self.logger.debug(msg)
-            status = self._load_cache_file()
-            if status is not True:
-                msg = "Outdated cache file failed loading."
-                raise PCSEError(msg)
+            self.logger.debug(msg, e)
 
     def _get_and_process_NASAPower(self, latitude, longitude):
         """Handles the retrieval and processing of the NASA Power data

@@ -34,7 +34,7 @@ setup(
     download_url='http://github.com/ajwdewit/pcse/tarball/'+VERSION,
     license='EUPL',
     author=AUTHOR,
-    install_requires=['numpy>=1.6.0',
+    install_requires=['numpy==1.6.1',
                       'PyYAML>=3.11',
                       'tabulate>=0.7.0',
                       'xlrd>=0.9.3',
